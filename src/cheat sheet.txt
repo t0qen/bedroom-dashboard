@@ -1,0 +1,31 @@
+Led matrix
+==========
+
+display.fill(state)
+-> fill all the matrix
+
+display.pixel(x, y, state)
+-> show/clear a specific pixel
+
+display.hline(x, y, w, state)
+-> horizontal line
+
+display.vline(x, y, h, state)
+-> vertical line
+
+display.line(x1, y1, x2, y2, state)
+-> sample line
+
+display.rect(x1, y1, x2, y2, state)
+-> rect border
+
+display.fill_rect(2, 2, 4, 4, state)
+-> full rect
+
+display.text("", x, y, state)
+-> text
+
+display.scroll(dx, dy)
+-> scroll the content before show()
+
+display.show()
