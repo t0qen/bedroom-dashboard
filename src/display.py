@@ -15,6 +15,11 @@ class Display:
         self.display = max7219.Matrix8x8(self.spi, self.cs, 1)
         self.display.brightness(5)
         self.display.fill(0)
+        self.display.show()
+
+    def clear(self):
+        self.display.fill(0)
+        self.display.show()
 
     def draw_buffer(self, buffer):
         self.display.fill(0)
