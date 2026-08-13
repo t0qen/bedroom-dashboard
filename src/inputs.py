@@ -23,6 +23,10 @@ class Button:
                     self.global_state = "PRESSED"
                 else:
                     self.global_state = "RELEASED"
-
-        return self.global_state
+        if self.global_state is not None:
+            state = self.global_state
+            self.global_state = None
+            return state
+        
+        return None
 

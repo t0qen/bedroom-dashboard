@@ -1,0 +1,6 @@
+xiao/.pio
+xiao/.pioenvs
+xiao/.piolibdeps
+xiao/.vscode/.browse.c_cpp.db*
+xiao/.vscode/c_cpp_properties.json
+xiao/.vscode/launch.json
