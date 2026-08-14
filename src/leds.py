@@ -1,6 +1,14 @@
 from machine import Pin, PWM
 
-class Leds:
+
+# Source - https://stackoverflow.com/a/70659904
+# Posted by CrazyChucky, modified by community. See post 'Timeline' for change history
+# Retrieved 2026-08-14, License - CC BY-SA 4.0
+def map_range(x, in_min, in_max, out_min, out_max):
+  return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
+
+
+class Led:
     def __init__(self, pin):
         self.pin = pin
         self.led = Pin(self.pin, Pin.OUT)
@@ -23,9 +31,9 @@ class RGBLed:
         self.current_mode = None
 
     def set_color(self, r, g, b):
-        self.led_r.duty_u16(r)
-        self.led_g.duty_u16(g)
-        self.led_b.duty_u16(b)
+        self.led_r.duty_u16(map_range(r, 0, 100, 0, 65535))
+        self.led_g.duty_u16(map_range(g, 0, 100, 0, 65535))
+        self.led_b.duty_u16(map_range(b, 0, 100, 0, 65535))
     
     def off(self):
         self.led_r.duty_u16(0)
@@ -36,7 +44,7 @@ class RGBLed:
         self.off()
         self.current_mode = mode
 
-    def update(self, time):
+    def update(self, current_time):
         if self.current_mode == "think":
             pass
         elif self.current_mode == "waiting": 
