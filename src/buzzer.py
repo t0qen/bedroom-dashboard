@@ -32,3 +32,5 @@ class Buzzer:
                 if current_time - self.mode_started_time  > self.current_mode[2]:
                     print("[buzzer.py] INFO: mode finished")
                     self.buzzer.duty_u16(0)
+                    self.mode_started_time = None
+                    self.current_mode = None

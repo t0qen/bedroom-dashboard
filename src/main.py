@@ -1,4 +1,4 @@
-import apps, display, inputs, leds, remote_hack, xiao, buzzer
+import apps, display, inputs, leds, remote_hack, xiao, buzzer, pot
 import time
 
 epaper = xiao.Display()
@@ -11,18 +11,24 @@ buzz = buzzer.Buzzer(5)
 
 led_rgb = leds.RGBLed(13, 12, 11)
 
+pot_a = pot.Pot(26)
+pot_b = pot.Pot(27)
+
 def clean():
     led_a.off()
     led_b.off()
     led_c.off()
     led_rgb.off()
 
-buzz.bip()
 
 try:
     while True:
-        time.sleep(0.001)
+        time.sleep(0.01)
         now = time.ticks_ms()
+
+        print("a: " + str(pot_a.read()))
+        print("b: " + str(pot_b.read()))
+
         buzz.update(now)
 
     
