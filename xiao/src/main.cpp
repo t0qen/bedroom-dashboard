@@ -45,7 +45,7 @@
 //   //   display.drawBitmap(0, 0, imageBuffer, 296, 128, couleur(2));
 //   //   display.display(false);
 //   // }
-  
+
 // }
 
 // void loop()
@@ -211,6 +211,9 @@
 //     }
 //   }
 // }
+
+// ai generated code, dont read this, it just works 
+
 #include <GxEPD2_BW.h>
 #include <GxEPD2_3C.h>
 #include <GxEPD2_4C.h>
@@ -224,10 +227,10 @@
 #include "freertos/queue.h"
 
 // --- CONFIG WIFI & HA ---
-const char* ssid = "Livebox-B780";
-const char* password = "5tCVCnX9kFXfrPXNR7";
-const char* haIp = "192.168.1.23";
-const char* haToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxYTUyMjhmM2IzZjc0ZWY1OWZkZGIyZDc3ZGE4YjIxNSIsImlhdCI6MTc4Njc4MTYwNSwiZXhwIjoyMTAyMTQxNjA1fQ.tA3-pHjlnMmLU6XyKy-LzGls-aqS6-Mp0SBAz0Nn5kU";
+const char *ssid = "Livebox-B780";
+const char *password = "5tCVCnX9kFXfrPXNR7";
+const char *haIp = "192.168.1.23";
+const char *haToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxYTUyMjhmM2IzZjc0ZWY1OWZkZGIyZDc3ZGE4YjIxNSIsImlhdCI6MTc4Njc4MTYwNSwiZXhwIjoyMTAyMTQxNjA1fQ.tA3-pHjlnMmLU6XyKy-LzGls-aqS6-Mp0SBAz0Nn5kU";
 
 GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> display(
     GxEPD2_290_C90c(3, 5, 2, 4));
@@ -239,27 +242,34 @@ QueueHandle_t displayQueue;
 
 uint16_t couleur(int c)
 {
-  if (c == 0) return GxEPD_BLACK;
-  if (c == 1) return GxEPD_WHITE;
-  if (c == 2) return GxEPD_RED;
+  if (c == 0)
+    return GxEPD_BLACK;
+  if (c == 1)
+    return GxEPD_WHITE;
+  if (c == 2)
+    return GxEPD_RED;
   return GxEPD_BLACK;
 }
 
 // ==========================================
 // TON CODE D'AFFICHAGE (INTACT)
 // ==========================================
-void processDisplayCommand(String cmd) {
-  if (cmd == "display()") {
+void processDisplayCommand(String cmd)
+{
+  if (cmd == "display()")
+  {
     display.display(false);
     return;
   }
-  if (cmd == "clearScreen()") {
+  if (cmd == "clearScreen()")
+  {
     display.fillScreen(GxEPD_WHITE);
     return;
   }
 
   int openParen = cmd.indexOf('(');
-  if (openParen == -1) return;
+  if (openParen == -1)
+    return;
 
   String func = cmd.substring(0, openParen);
   String args = cmd.substring(openParen + 1, cmd.length() - 1);
@@ -267,23 +277,28 @@ void processDisplayCommand(String cmd) {
   args.toCharArray(buf, 128);
 
   // --- FONCTIONS DE BASE ---
-  if (func == "fillScreen") {
-    int c; sscanf(buf, "%d", &c);
+  if (func == "fillScreen")
+  {
+    int c;
+    sscanf(buf, "%d", &c);
     display.fillScreen(couleur(c));
   }
-  else if (func == "drawLine") {
+  else if (func == "drawLine")
+  {
     int x0, y0, x1, y1, c;
     sscanf(buf, "%d, %d, %d, %d, %d", &x0, &y0, &x1, &y1, &c);
     display.drawLine(x0, y0, x1, y1, couleur(c));
   }
   // ... J'ai raccourci ici pour l'exemple, MAIS TU LAISSES TOUT TES ELSE IF ORIGINAUX ...
   // (drawRect, drawCircle, setCursor, print, drawBinImage, etc...)
-  else if (func == "drawBinImage") {
+  else if (func == "drawBinImage")
+  {
     char filename[32];
     int x, y, w, h, c;
     sscanf(buf, "%[^,], %d, %d, %d, %d, %d", filename, &x, &y, &w, &h, &c);
     File f = LittleFS.open(filename, "r");
-    if (f) {
+    if (f)
+    {
       f.read(imageBuffer, (w * h) / 8);
       f.close();
       display.drawBitmap(x, y, imageBuffer, w, h, couleur(c));
@@ -294,46 +309,86 @@ void processDisplayCommand(String cmd) {
 // ==========================================
 // TÂCHE 1 : RÉSEAU ET HOME ASSISTANT (Priorité haute, jamais bloquée par l'écran)
 // ==========================================
-void networkTask(void *parameter) {
-  while (true) {
-    if (Serial1.available()) {
+void networkTask(void *parameter)
+{
+  while (true)
+  {
+    if (Serial1.available())
+    {
       String cmd = Serial1.readStringUntil('\n');
       cmd.trim();
-      if (cmd.length() == 0) continue;
+      if (cmd.length() == 0)
+        continue;
 
-      if (cmd.startsWith("HA_")) {
+      if (cmd.startsWith("HA_"))
+      {
         // C'est une commande HA, on la traite tout de suite
-        if (WiFi.status() == WL_CONNECTED) {
+        if (WiFi.status() == WL_CONNECTED)
+        {
           HTTPClient http;
           String url = "http://" + String(haIp) + ":8123/api/services/homeassistant/";
           String payload = "";
-          
-          if (cmd.startsWith("HA_ON(")) {
+
+          if (cmd.startsWith("HA_ON("))
+          {
             String entity = cmd.substring(6, cmd.length() - 1);
             url += "turn_on";
             payload = "{\"entity_id\": \"" + entity + "\"}";
-          } 
-          else if (cmd.startsWith("HA_OFF(")) {
+          }
+          else if (cmd.startsWith("HA_OFF("))
+          {
             String entity = cmd.substring(7, cmd.length() - 1);
             url += "turn_off";
             payload = "{\"entity_id\": \"" + entity + "\"}";
           }
-          else if (cmd.startsWith("HA_TOGGLE(")) {
+          else if (cmd.startsWith("HA_TOGGLE("))
+          {
             String entity = cmd.substring(10, cmd.length() - 1);
             url += "toggle";
             payload = "{\"entity_id\": \"" + entity + "\"}";
           }
-          else if (cmd.startsWith("HA_BRIGHT(")) {
+          else if (cmd.startsWith("HA_BRIGHT("))
+          {
             String args = cmd.substring(10, cmd.length() - 1);
             int comma = args.indexOf(',');
             String entity = args.substring(0, comma);
             String bright = args.substring(comma + 1);
-            
+
             url = "http://" + String(haIp) + ":8123/api/services/light/turn_on";
             payload = "{\"entity_id\": \"" + entity + "\", \"brightness\": " + bright + "}";
           }
+          else if (cmd.startsWith("HA_COLOR("))
+          {
+            // Format reçu : HA_COLOR(light.salon, 255, 0, 0)
+            String args = cmd.substring(9, cmd.length() - 1);
 
-          if (payload != "") {
+            int c1 = args.indexOf(',');
+            int c2 = args.indexOf(',', c1 + 1);
+            int c3 = args.indexOf(',', c2 + 1);
+
+            String entity = args.substring(0, c1);
+            String r = args.substring(c1 + 1, c2);
+            String g = args.substring(c2 + 1, c3);
+            String b = args.substring(c3 + 1);
+
+            url = "http://" + String(haIp) + ":8123/api/services/light/turn_on";
+            payload = "{\"entity_id\": \"" + entity + "\", \"rgb_color\": [" + r + ", " + g + ", " + b + "]}";
+          }
+
+          else if (cmd.startsWith("HA_TEMP("))
+          {
+            // Format reçu : HA_TEMP(light.salon, 4000)
+            String args = cmd.substring(8, cmd.length() - 1);
+            int c1 = args.indexOf(',');
+
+            String entity = args.substring(0, c1);
+            String kelvin = args.substring(c1 + 1);
+
+            url = "http://" + String(haIp) + ":8123/api/services/light/turn_on";
+            payload = "{\"entity_id\": \"" + entity + "\", \"kelvin\": " + kelvin + "}";
+          }
+          if (payload != "")
+          {
             http.begin(url);
             http.addHeader("Authorization", "Bearer " + String(haToken));
             http.addHeader("Content-Type", "application/json");
@@ -341,7 +396,9 @@ void networkTask(void *parameter) {
             http.end();
           }
         }
-      } else {
+      }
+      else
+      {
         // C'est une commande d'affichage, on l'envoie à la Tâche 2 via un "tuyau" (Queue)
         char cmdBuf[128];
         cmd.toCharArray(cmdBuf, 128);
@@ -355,11 +412,14 @@ void networkTask(void *parameter) {
 // ==========================================
 // TÂCHE 2 : AFFICHAGE E-PAPER (Peut bloquer 15s, on s'en fiche)
 // ==========================================
-void displayTask(void *parameter) {
+void displayTask(void *parameter)
+{
   char cmdBuf[128];
-  while (true) {
+  while (true)
+  {
     // On attend de recevoir une commande depuis la Tâche 1
-    if (xQueueReceive(displayQueue, &cmdBuf, portMAX_DELAY) == pdPASS) {
+    if (xQueueReceive(displayQueue, &cmdBuf, portMAX_DELAY) == pdPASS)
+    {
       processDisplayCommand(String(cmdBuf));
     }
   }
@@ -368,7 +428,8 @@ void displayTask(void *parameter) {
 // ==========================================
 // SETUP ET LANCEMENT DES TÂCHES
 // ==========================================
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   Serial1.begin(115200, SERIAL_8N1, D7, D6);
   delay(3000);
@@ -376,7 +437,8 @@ void setup() {
   // Connexion Wi-Fi
   WiFi.begin(ssid, password);
   Serial.print("Connexion WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -385,8 +447,9 @@ void setup() {
   display.init(115200, true, 2, false);
   display.setRotation(1);
   display.fillScreen(GxEPD_WHITE);
-  
-  if(!LittleFS.begin()){
+
+  if (!LittleFS.begin())
+  {
     Serial.println("ERREUR : LittleFS n'a pas démarré !");
   }
 
@@ -398,6 +461,7 @@ void setup() {
   xTaskCreatePinnedToCore(displayTask, "DisplayTask", 10000, NULL, 1, NULL, 1); // Priorité 1 (basse)
 }
 
-void loop() {
+void loop()
+{
   // Vide, tout est géré par FreeRTOS dans les tâches ci-dessus
 }

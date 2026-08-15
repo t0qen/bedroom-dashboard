@@ -43,7 +43,7 @@ try:
         # --- LOGIQUE HOME ASSISTANT ---
         brightness_pct = pot_a.read()
         
-        if abs(brightness_pct - last_brightness_sent) >= 2:
+        if abs(brightness_pct - last_brightness_sent) >= 10:
             # L'envoi UART est instantané, ça n'impacte pas la file d'attente de l'écran
             ha.set_brightness(home_assistant.Device.LUMIERE_SALON, brightness_pct)
             last_brightness_sent = brightness_pct
