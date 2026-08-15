@@ -80,35 +80,3 @@ class Display:
                 print("[xiao.py] INFO: commands sended to xiao")
 
 
-
-
-
-
-    
-    # def update(self):
-    #     self.uart.write("display()" + "\n")
-    #     while True:
-    #         if self.uart.any():
-    #             reponse = self.uart.readline()
-    #             if reponse and isinstance(reponse, bytes):
-    #                 texte = reponse.decode('utf-8').strip()
-    #                 if texte == "DONE":
-    #                     print("Ecran mis à jour !")
-    #                     break
-    #     time.sleep(0.1)
-
-
-    # if __name__ == '__main__':
-    #     send("clearScreen()") 
-    #     send("fillScreen(1)") 
-
-    #     send("setTextColor(0)")
-    #     send("setTextSize(2)")
-    #     send("setCursor(10, 10)")
-    #     send("print(Coucou Maman, ceci est un ecran e-ink, cet-a-dire a encre electronique. Comme sur les liseuses.)")
-    
-    #     send("setTextColor(2)")
-    #     send("setTextSize(1)")
-    #     send("setCursor(10, 90)")
-    #     send("print(Il peut afficher en rouge aussi)")
-    #     update() 
