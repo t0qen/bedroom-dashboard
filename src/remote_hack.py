@@ -17,7 +17,7 @@ class Remote:
         self.state = "WAITING"
         self.current_button = None
         self.time_start_impulsion = 0
-        self.impulsion_time = 10
+        self.impulsion_time = 100
         self.queue = []
 
     def press(self, button):

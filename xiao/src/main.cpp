@@ -237,7 +237,6 @@ GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> display(
 
 uint8_t imageBuffer[5000];
 
-// Variable partagée pour envoyer les commandes d'affichage d'une tâche à l'autre
 QueueHandle_t displayQueue;
 
 uint16_t couleur(int c)
@@ -251,9 +250,7 @@ uint16_t couleur(int c)
   return GxEPD_BLACK;
 }
 
-// ==========================================
-// TON CODE D'AFFICHAGE (INTACT)
-// ==========================================
+
 void processDisplayCommand(String cmd)
 {
   if (cmd == "display()")
@@ -306,9 +303,6 @@ void processDisplayCommand(String cmd)
   }
 }
 
-// ==========================================
-// TÂCHE 1 : RÉSEAU ET HOME ASSISTANT (Priorité haute, jamais bloquée par l'écran)
-// ==========================================
 void networkTask(void *parameter)
 {
   while (true)
@@ -409,15 +403,12 @@ void networkTask(void *parameter)
   }
 }
 
-// ==========================================
-// TÂCHE 2 : AFFICHAGE E-PAPER (Peut bloquer 15s, on s'en fiche)
-// ==========================================
+
 void displayTask(void *parameter)
 {
   char cmdBuf[128];
   while (true)
   {
-    // On attend de recevoir une commande depuis la Tâche 1
     if (xQueueReceive(displayQueue, &cmdBuf, portMAX_DELAY) == pdPASS)
     {
       processDisplayCommand(String(cmdBuf));
@@ -425,9 +416,7 @@ void displayTask(void *parameter)
   }
 }
 
-// ==========================================
-// SETUP ET LANCEMENT DES TÂCHES
-// ==========================================
+
 void setup()
 {
   Serial.begin(115200);
@@ -452,8 +441,16 @@ void setup()
   {
     Serial.println("ERREUR : LittleFS n'a pas démarré !");
   }
-
-  // Création du "tuyau" de communication entre les deux tâches
+  // File f = LittleFS.open("/cat.bin", "r");
+  // if (f)
+  // {
+  //   Serial.println("image");
+  //   f.read(imageBuffer, (296 * 128) / 8);
+  //   f.close();
+  //   display.drawBitmap(0, 0, imageBuffer, 296, 128, couleur(2));
+  //   display.display(false);
+  //   Serial.println("finished image");
+  // }
   displayQueue = xQueueCreate(10, sizeof(char[128]));
 
   // Lancement des deux tâches en parallèle sur le 2ème cœur ou via le scheduler

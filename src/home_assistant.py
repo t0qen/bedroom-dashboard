@@ -1,16 +1,18 @@
 
 class Device:
-    LUMIERE_SALON = "light.ampoule_atelier"
-    LUMIERE_CHAMBRE = "light.chambre"
-    PRISE_BUREAU = "switch.prise_bureau"
+    LATELIER = "light.ampoule_atelier"
+    LPRINCIPALE = "light.ampoule_principale"
+    LBUREAU = "light.lampe_bureau"
+    LLEDS = "light.leds_chambre"
+    PPC = "switch.prise_pc"
+    PGLOBALE = "switch.prise_study"
+    PETAGERE = "switch.prise_etagere"
 
 class HomeAssistant:
     def __init__(self, uart):
-        # On récupère l'objet UART déjà configuré dans ton main.py
         self.uart = uart
 
     def _send(self, command):
-        # On ajoute un '\n' car le code C++ fait un readStringUntil('\n')
         self.uart.write(command + "\n")
 
     def turn_on(self, device):
@@ -22,7 +24,15 @@ class HomeAssistant:
     def toggle(self, device):
         self._send(f"HA_TOGGLE({device})")
 
-    def set_brightness(self, device, brightness_pct):
-        # HA attend une valeur de 0 à 255
-        brightness_val = int((brightness_pct / 100) * 255)
-        self._send(f"HA_BRIGHT({device}, {brightness_val})")
+    def set_brightness(self, device, brightness):
+        if brightness > 100:
+            brightness = 100
+        if brightness < 0:
+            brightness = 0
+        self._send(f"HA_BRIGHT({device}, {brightness})")
+
+    def set_color(self, device, r, g, b):
+        self._send(f"HA_COLOR({device}, {r}, {g}, {b})")
+
+    def set_color_temp(self, device, kelvin):
+        self._send(f"HA_TEMP({device}, {kelvin})")
