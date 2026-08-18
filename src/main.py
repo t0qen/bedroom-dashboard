@@ -69,12 +69,12 @@ def test():
 
     
     remote.press("c")
-    epaper.show_image("logo")
+    epaper.show_image("logo", img_r=None)
 
     buzz.bip()
 
 # test()
-
+epaper.show_image("cat", img_r=None, c=3)
 try:
     while True:
         time.sleep(0.01)

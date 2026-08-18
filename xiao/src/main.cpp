@@ -1,3 +1,4 @@
+
 // ai generated code, dont read this, it just works
 
 #include <GxEPD2_BW.h>
@@ -83,7 +84,7 @@ void processDisplayCommand(String cmd)
     {
       f.read(imageBuffer, (w * h) / 8);
       f.close();
-      display.drawBitmap(x, y, imageBuffer, w, h, couleur(c));
+      display.drawInvertedBitmap(x, y, imageBuffer, w, h, couleur(c));
     }
   }
   else if (func == "draw3ColorImage")
@@ -99,7 +100,7 @@ void processDisplayCommand(String cmd)
     {
       f_b.read(imageBuffer, (w * h) / 8);
       f_b.close();
-      display.drawBitmap(x, y, imageBuffer, w, h, GxEPD_BLACK);
+      display.drawInvertedBitmap(x, y, imageBuffer, w, h, GxEPD_BLACK);
     }
 
     File f_r = LittleFS.open(filename_red, "r");
@@ -107,7 +108,7 @@ void processDisplayCommand(String cmd)
     {
       f_r.read(imageBuffer, (w * h) / 8);
       f_r.close();
-      display.drawBitmap(x, y, imageBuffer, w, h, GxEPD_RED);
+      display.drawInvertedBitmap(x, y, imageBuffer, w, h, GxEPD_RED);
     }
   }
 }
@@ -248,16 +249,33 @@ void setup()
   {
     Serial.println("ERREUR : LittleFS n'a pas démarré !");
   }
-  // File f = LittleFS.open("/cat.bin", "r");
+  // File f = LittleFS.open("/power-outlets.bin", "r");
   // if (f)
   // {
-  //   Serial.println("image");
+  //   Serial.println("p");
   //   f.read(imageBuffer, (296 * 128) / 8);
   //   f.close();
-  //   display.drawBitmap(0, 0, imageBuffer, 296, 128, couleur(2));
+  //   display.drawInvertedBitmap(0, 0, imageBuffer, 296, 128, couleur(0));
   //   display.display(false);
   //   Serial.println("finished image");
   // }
+  // File f_b = LittleFS.open("/menu_radio_b.bin", "r");
+  // if (f_b)
+  // {
+  //   f_b.read(imageBuffer, (296 * 128) / 8);
+  //   f_b.close();
+  //   display.drawInvertedBitmap(0, 0, imageBuffer, 296, 128, GxEPD_BLACK);
+  // }
+
+  // File f_r = LittleFS.open("/menu_radio_r.bin", "r");
+  // if (f_r)
+  // {
+  //   f_r.read(imageBuffer, (296 * 128) / 8);
+  //   f_r.close();
+  //   display.drawInvertedBitmap(0, 0, imageBuffer, 296, 128, GxEPD_RED);
+  // }
+  // display.display();
+
   displayQueue = xQueueCreate(10, sizeof(char[128]));
 
   // Lancement des deux tâches en parallèle sur le 2ème cœur ou via le scheduler

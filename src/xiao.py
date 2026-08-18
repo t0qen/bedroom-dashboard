@@ -64,7 +64,7 @@ class Display:
                     cmd = f"drawBinImage(/{self.image_queue[0]}.bin, {self.image_queue[2]}, {self.image_queue[3]}, {self.image_queue[4]}, {self.image_queue[5]}, {self.image_queue[6]})\n"
                     print("[xiao.py] INFO: 2 colors mode")
                 else:
-                    cmd = f"draw3ColorImage(/{self.image_queue[0]}.bin, /{self.image_queue[1]}.bin, {self.image_queue[2]}, {self.image_queue[3]}, {self.image_queue[4]}, {self.image_queue[5]}, {self.image_queue[6]})\n"
+                    cmd = f"draw3ColorImage(/{self.image_queue[0]}.bin, /{self.image_queue[1]}.bin, {self.image_queue[2]}, {self.image_queue[3]}, {self.image_queue[4]}, {self.image_queue[5]})\n"
                     print("[xiao.py] INFO: 3 colors mode")
 
                 self.uart.write(cmd)
