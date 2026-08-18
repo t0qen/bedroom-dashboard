@@ -1,0 +1,15 @@
+
+
+workflow :
+
+- get image 
+- resize 128*296
+- use magick to transform it into 3 colors:
+
+    magick xc:red xc:white xc:black +append palette.gif
+    magick input_image.png -remap palette.gif result_image.png
+
+- then use a tool (idk for now) to sperate the 3 colors layers of the images into 2 files
+
+- convert them into .bin and put them in data/
+- upload filesystem

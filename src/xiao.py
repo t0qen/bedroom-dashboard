@@ -29,12 +29,14 @@ class Display:
         else:
             print(f"[xiao.py] WARNING: command '{cmd}' has already been added to queue")
 
-    def show_image(self, img, x=0, y=0, w=296, h=128, c=0):
-        if img != self.last_image:
-            self.image_queue = [img, x, y, w, h, c]
-            print(f"[xiao.py] INFO: image '{img}' has been added to queue")
+    def show_image(self, img_b, img_r, x=0, y=0, w=296, h=128, c=0):
+        if img_b != self.last_image:
+            self.image_queue = [img_b, img_r, x, y, w, h, c]
+            print(f"[xiao.py] INFO: image '{img_b, img_r}' has been added to queue")
         else:
-            print(f"[xiao.py] WARNING: image '{img}' has already been added to queue")
+            print(f"[xiao.py] WARNING: image '{img_b, img_r}' has already been added to queue")
+
+
 
     def update(self, current_time):
         global xiao_finished
@@ -57,7 +59,14 @@ class Display:
                 time.sleep(0.01)
                 self.uart.write("fillScreen(1)\n")
                 time.sleep(0.01)
-                cmd = f"drawBinImage(/{self.image_queue[0]}.bin, {self.image_queue[1]}, {self.image_queue[2]}, {self.image_queue[3]}, {self.image_queue[4]}, {self.image_queue[5]})\n"
+
+                if self.image_queue[1] == None:
+                    cmd = f"drawBinImage(/{self.image_queue[0]}.bin, {self.image_queue[2]}, {self.image_queue[3]}, {self.image_queue[4]}, {self.image_queue[5]}, {self.image_queue[6]})\n"
+                    print("[xiao.py] INFO: 2 colors mode")
+                else:
+                    cmd = f"draw3ColorImage(/{self.image_queue[0]}.bin, /{self.image_queue[1]}.bin, {self.image_queue[2]}, {self.image_queue[3]}, {self.image_queue[4]}, {self.image_queue[5]}, {self.image_queue[6]})\n"
+                    print("[xiao.py] INFO: 3 colors mode")
+
                 self.uart.write(cmd)
                 time.sleep(0.01)
                 self.uart.write("display()\n")

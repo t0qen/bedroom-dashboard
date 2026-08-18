@@ -1,4 +1,4 @@
-import apps, inputs, leds, remote_hack, xiao, buzzer, pot, home_assistant
+import apps, inputs, leds, remote_hack, xiao, buzzer, home_assistant
 import time
 
 
@@ -19,8 +19,8 @@ buzz = buzzer.Buzzer(5)
 
 led_rgb = leds.RGBLed(11, 13, 12)
 
-pot_a = pot.Pot(26)
-pot_b = pot.Pot(27)
+pot = inputs.Pot(28)
+
 
 
 def clean():
@@ -54,8 +54,7 @@ def test():
 
     i = 0
     while i < 200:
-        print("pot a: " + str(pot_a.read()))
-        print("pot b: " + str(pot_b.read()))
+        print("pot: " + str(pot.read()))
         i += 1
         time.sleep(0.1)
 
@@ -74,7 +73,7 @@ def test():
 
     buzz.bip()
 
-test()
+# test()
 
 try:
     while True:
@@ -90,4 +89,3 @@ except KeyboardInterrupt:
 
 finally:
     clean()
-
