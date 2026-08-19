@@ -129,7 +129,10 @@ current_menu_state = "LIGHTS"
 is_active = False
 displayed_menu_state = None
 last_activity_time = time.ticks_ms()
-
+pot_changed = False
+lights_submenu_counter = 1
+sockets_submenu_counter = 1
+radio_submenu_counter = 1
 
 try:
     while True:
@@ -197,6 +200,39 @@ try:
             elif current_btn_hme_state == "RELEASED":
 
                 current_global_state = current_menu_state
+
+        else:
+            if current_global_state == "LIGHTS":
+                if current_btn_bck_state == "RELEASED":
+                    lights_submenu_counter -= 1
+                elif current_btn_frw_state == "RELEASED":
+                    lights_submenu_counter += 1
+
+                if abs(current_pot_value - last_pot_value) >= 2:
+                    current_lights = None
+                    if lights_submenu_counter == 1:
+                        ha.set_brightness(home_assistant.Device.LATELIER, current_pot_value)
+                    if lights_submenu_counter == 2:
+                        ha.set_color_temp(home_assistant.Device.LATELIER, inputs.map_range(current_pot_value, 0, 100, ))
+                    # TODO
+
+                if lights_submenu_counter > 8: # count each colors of every lights
+                    lights_submenu_counter = 1
+
+            elif current_global_state == "SOCKETS":
+                if current_btn_bck_state == "RELEASED":
+                    sockets_submenu_counter -= 1
+                elif current_btn_frw_state == "RELEASED":
+                    sockets_submenu_counter += 1
+
+                if sockets_submenu_counter > 5:
+                    sockets_submenu_counter = 1
+
+            elif current_global_state == "RADIO":
+                pass
+
+            if current_btn_hme_state == "RELEASED":            
+                current_global_state = "MENU"
 
         # display
         if current_global_state == "MENU":
