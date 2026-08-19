@@ -29,6 +29,11 @@ class RGBLed:
         self.led_b.freq(5000)
 
         self.current_mode = None
+        self.new_mode = False
+        self.counter = 0
+        self.phase = []
+
+        self.last_millis = 0
 
     def set_color(self, r, g, b):
         self.led_r.duty_u16(map_range(r, 0, 100, 0, 65535))
@@ -43,11 +48,42 @@ class RGBLed:
     def set_mode(self, mode):   
         self.off()
         self.current_mode = mode
+        self.new_mode = True
+        self.counter = 0
 
     def update(self, current_time):
-        if self.current_mode == "think":
-            pass
-        elif self.current_mode == "waiting": 
-            pass
-        else:
-            pass
+        if self.current_mode == "menu_lights":
+
+            if self.new_mode:
+                self.new_mode = False
+                # mode setup
+
+                step = 20
+                phase1 = [
+                    [val, val, val]
+                    for val in range(step + 1)
+                ]
+                phase2 = [
+                    [val, val, step]
+                    for val in range(step - 1, -1, -1)
+                ]
+                self.phase = phase1 + phase2
+
+            if current_time - self.last_millis >= 30:
+                self.set_color(self.phase[self.counter][0], self.phase[self.counter][1], self.phase[self.counter][2]) 
+                self.counter += 1
+                if self.counter >= len(self.phase):
+                    self.counter = 0
+
+                self.last_millis = current_time
+                 
+        elif self.current_mode == "menu_sockets": 
+            if self.new_mode:
+                self.new_mode = False
+                # mode setup
+
+        elif self.current_mode == "menu_radio": 
+
+            if self.new_mode:
+                self.new_mode = False
+                # mode setup

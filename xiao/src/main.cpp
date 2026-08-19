@@ -12,8 +12,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "esp_task_wdt.h"
 
-// --- CONFIG WIFI & HA ---
 const char *ssid = "Livebox-B780";
 const char *password = "5tCVCnX9kFXfrPXNR7";
 const char *haIp = "192.168.1.23";
@@ -42,6 +42,8 @@ void processDisplayCommand(String cmd)
   if (cmd == "display()")
   {
     display.display(false);
+    Serial1.println("DONE");
+    Serial1.flush();         // On force l'envoi immédiat
     return;
   }
   if (cmd == "clearScreen()")
@@ -194,6 +196,7 @@ void networkTask(void *parameter)
           if (payload != "")
           {
             http.begin(url);
+            http.setTimeout(2000);
             http.addHeader("Authorization", "Bearer " + String(haToken));
             http.addHeader("Content-Type", "application/json");
             http.POST(payload);
@@ -215,6 +218,7 @@ void networkTask(void *parameter)
 
 void displayTask(void *parameter)
 {
+  esp_task_wdt_delete(NULL); 
   char cmdBuf[128];
   while (true)
   {
@@ -228,6 +232,7 @@ void displayTask(void *parameter)
 void setup()
 {
   Serial.begin(115200);
+  Serial1.setRxBufferSize(8192); 
   Serial1.begin(115200, SERIAL_8N1, D7, D6);
   delay(3000);
 
@@ -275,12 +280,13 @@ void setup()
   //   display.drawInvertedBitmap(0, 0, imageBuffer, 296, 128, GxEPD_RED);
   // }
   // display.display();
+  // Serial.println("busy");
 
   displayQueue = xQueueCreate(10, sizeof(char[128]));
 
   // Lancement des deux tâches en parallèle sur le 2ème cœur ou via le scheduler
   xTaskCreatePinnedToCore(networkTask, "NetworkTask", 10000, NULL, 2, NULL, 0); // Priorité 2 (haute)
-  xTaskCreatePinnedToCore(displayTask, "DisplayTask", 10000, NULL, 1, NULL, 1); // Priorité 1 (basse)
+  xTaskCreatePinnedToCore(displayTask, "DisplayTask", 16384, NULL, 1, NULL, 1); // Priorité 1 (basse)
 }
 
 void loop()

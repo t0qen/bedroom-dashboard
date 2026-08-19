@@ -74,15 +74,117 @@ def test():
     buzz.bip()
 
 # test()
-epaper.show_image("cat", img_r=None, c=3)
+
+
+# def test2():
+#     while True:
+#         time.sleep(0.01)
+#         now = time.ticks_ms()
+        
+
+        # for i in range(100):
+
+        #     led_rgb.set_color(0, i, int(i / 2))
+        #     time.sleep_ms(2)
+        # for i in range(100):
+        #     led_rgb.set_color(0, abs(i - 100) , int(abs(i - 100) / 2))
+        #     time.sleep_ms(7)
+
+        # step = 20
+
+        # for i in range(step):
+        #     led_rgb.set_color(i, 0, abs(i - step))
+        #     time.sleep_ms(20)
+        # for i in range(step):
+        #     led_rgb.set_color(abs(i - step), i , 0)
+        #     time.sleep_ms(20) 
+        # for i in range(step):
+        #     led_rgb.set_color(0, abs(i - step), i)
+        #     time.sleep_ms(20) 
+
+        # for i in range(step):
+        #     led_rgb.set_color(i, i, i)
+        #     time.sleep_ms(20)
+        # for i in range(step):
+        #     led_rgb.set_color(abs(i - step), abs(i - step), step)
+        #     time.sleep_ms(10)   
+        # for i in range(step):
+        #     led_rgb.set_color(0, 0, abs(i - step))
+        #     time.sleep_ms(20)
+
+        # for i in range(33):
+        #     led_rgb.set_color(abs(i - 33), abs(i - 33), abs(i - 33))
+        #     time.sleep_ms(10)
+                        
+
+# test2()
+
+current_global_state = "MENU"
+last_menu_state = None
+current_menu_state = "LIGHTS"
+
+
+
 try:
     while True:
+        # global
         time.sleep(0.01)
         now = time.ticks_ms()
 
         buzz.update(now)
         epaper.update(now)
         remote.update(now)
+        led_rgb.update(now)
+
+        # print(current_menu_state)
+
+        # inputs
+        current_btn_bck_state = button_bck.is_pressed(now)
+        current_btn_frw_state = button_frw.is_pressed(now)
+        current_btn_hme_state = button_hme.is_pressed(now)
+        current_pot_value = pot.read()
+
+        # logic
+        if current_global_state == "MENU":
+
+            if current_btn_bck_state == "RELEASED":
+
+                if current_menu_state == "LIGHTS":
+                    current_menu_state = "RADIO"
+                elif current_menu_state == "SOCKETS":
+                    current_menu_state = "LIGHTS"
+                elif current_menu_state == "RADIO":
+                    current_menu_state = "SOCKETS"
+
+            elif current_btn_frw_state == "RELEASED":
+
+                if current_menu_state ==  "LIGHTS":
+                    current_menu_state = "SOCKETS"
+                elif current_menu_state == "SOCKETS":
+                    current_menu_state = "RADIO"
+                elif current_menu_state == "RADIO":
+                    current_menu_state = "LIGHTS"
+
+            elif current_btn_hme_state == "RELEASED":
+
+                current_global_state = current_menu_state
+
+        # display
+        if current_global_state == "MENU":
+            if current_menu_state != last_menu_state:
+                # print("update")
+                if current_menu_state =="LIGHTS":
+                    led_rgb.set_mode("menu_lights")
+                    epaper.show_image("menu_light_b", "menu_light_r")
+                elif current_menu_state =="SOCKETS":
+                    led_rgb.set_mode("menu_sockets")
+                    epaper.show_image("menu_socket_b", "menu_socket_r")
+                elif current_menu_state == "RADIO":
+                    led_rgb.set_mode("menu_radio")
+                    epaper.show_image("menu_radio_b", "menu_radio_r")
+
+        last_menu_state = current_menu_state
+
 
 except KeyboardInterrupt:
     print("[main.py] IMPORTANT: asked for stop the main program")
