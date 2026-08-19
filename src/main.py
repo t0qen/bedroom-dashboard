@@ -148,11 +148,26 @@ try:
         current_btn_bck_state = button_bck.is_pressed(now)
         current_btn_frw_state = button_frw.is_pressed(now)
         current_btn_hme_state = button_hme.is_pressed(now)
-        current_pot_value = pot.read()  
+        current_pot_value = pot.read()
+
+        if (
+            current_btn_bck_state == "PRESSED"
+            or current_btn_frw_state == "PRESSED"
+            or current_btn_hme_state == "PRESSED"
+        ):
+            print("on")
+            led_c.on()
+
 
         is_active = False
-        if current_btn_bck_state == "RELEASED" or current_btn_frw_state == "RELEASED" or current_btn_hme_state == "RELEASED":
+        if (
+            current_btn_bck_state == "RELEASED"
+            or current_btn_frw_state == "RELEASED"
+            or current_btn_hme_state == "RELEASED"
+        ):
+            led_c.off()
             is_active = True
+           
         if abs(current_pot_value - last_pot_value) >= 2:
             is_active = True
 
@@ -162,6 +177,7 @@ try:
         # logic
         if current_global_state == "MENU":
             if current_btn_bck_state == "RELEASED":
+
                 if current_menu_state == "LIGHTS":
                     current_menu_state = "RADIO"
                 elif current_menu_state == "SOCKETS":
@@ -170,6 +186,7 @@ try:
                     current_menu_state = "SOCKETS"
 
             elif current_btn_frw_state == "RELEASED":
+                
                 if current_menu_state == "LIGHTS":
                     current_menu_state = "SOCKETS"
                 elif current_menu_state == "SOCKETS":
@@ -178,6 +195,7 @@ try:
                     current_menu_state = "LIGHTS"
 
             elif current_btn_hme_state == "RELEASED":
+
                 current_global_state = current_menu_state
 
         # display
@@ -190,17 +208,19 @@ try:
                 elif current_menu_state == "RADIO":
                     led_rgb.set_mode("menu_radio")
 
-            if isinstance(last_activity_time, int) and now - last_activity_time >= 2000:
-                if displayed_menu_state != current_menu_state:
-           
-                    if current_menu_state == "LIGHTS":
-                        epaper.show_image("menu_light_b", "menu_light_r")
-                    elif current_menu_state == "SOCKETS":
-                        epaper.show_image("menu_socket_b", "menu_socket_r")
-                    elif current_menu_state == "RADIO":
-                        epaper.show_image("menu_radio_b", "menu_radio_r")
+            if (
+                isinstance(last_activity_time, int)
+                and now - last_activity_time >= 1000
+                and displayed_menu_state != current_menu_state
+            ):
+                if current_menu_state == "LIGHTS":
+                    epaper.show_image("menu_light_b", "menu_light_r")
+                elif current_menu_state == "SOCKETS":
+                    epaper.show_image("menu_socket_b", "menu_socket_r")
+                elif current_menu_state == "RADIO":
+                    epaper.show_image("menu_radio_b", "menu_radio_r")
 
-                    displayed_menu_state = current_menu_state
+                displayed_menu_state = current_menu_state
 
         last_menu_state = current_menu_state
         last_pot_value = current_pot_value
