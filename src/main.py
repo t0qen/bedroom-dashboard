@@ -314,28 +314,25 @@ try:
         # display
 
         # always update rgb led
-        update_rgb = False
+
         if current_global_state == "MENU" and current_menu_state != last_menu_state:
             led_rgb.set_mode(f"{current_menu_state}")
-        else:
-            if current_global_state != last_global_state:
-                update_rgb = True
+
+
 
         if current_global_state == "MENU":
             current_key = ("MENU", current_menu_state)
             
         elif current_global_state == "LIGHTS":
             current_key = ("LIGHTS", lights_submenu_counter)
-            if update_rgb:
-                led_rgb.set_mode(f"LIGHTS_{lights_submenu_counter}")
+            led_rgb.set_mode(f"LIGHTS_{lights_submenu_counter}")
+            print(f"LIGHTS_{lights_submenu_counter}")
         elif current_global_state == "SOCKETS":
             current_key = ("SOCKETS", sockets_submenu_counter)
-            if update_rgb:
-                led_rgb.set_mode(f"SOCKETS_{lights_submenu_counter}")
+            led_rgb.set_mode(f"SOCKETS_{lights_submenu_counter}")
         elif current_global_state == "RADIO":
             current_key = ("RADIO", 1)
-            if update_rgb:
-                led_rgb.set_mode("RADIO")
+            led_rgb.set_mode("RADIO")
         else:
             current_key = None
 

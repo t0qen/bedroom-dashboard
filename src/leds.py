@@ -44,10 +44,11 @@ class RGBLed:
 
     def set_mode(self, mode):
         self.off()
-        self.current_mode = mode
-        self.new_mode = True
-        self.counter = 0
-        print(f"[leds.py] INFO: new mode: '{self.current_mode}'")
+        if mode != self.current_mode:
+            self.current_mode = mode
+            self.new_mode = True
+            self.counter = 0
+            print(f"[leds.py] INFO: new mode: '{self.current_mode}'")
 
     def update(self, current_time):
         if self.current_mode == "LIGHTS":
@@ -147,11 +148,12 @@ class RGBLed:
 
                 step = 20
                 phase1 = [[val, val, val] for val in range(step + 1)]
-                phase2 = [[val, val, 0] for val in range(step - 1, -1, -1)]
+                phase2 = [[val, val, val] for val in range(step - 1, -1, -1)]
+                phase3 = [[val, val, 0] for val in range(step + 1)]
+                phase4 = [[val, val, 0] for val in range(step - 1, -1, -1)]
+                self.phase = phase1 + phase2 + phase3 + phase4
 
-                self.phase = phase1 + phase2
-
-            if current_time - self.last_millis >= 50:
+            if current_time - self.last_millis >= 20:
                 self.set_color(
                     self.phase[self.counter][0],
                     self.phase[self.counter][1],
@@ -173,7 +175,7 @@ class RGBLed:
 
                 self.phase = phase1 + phase2
 
-            if current_time - self.last_millis >= 50:
+            if current_time - self.last_millis >= 20:
                 self.set_color(
                     self.phase[self.counter][0],
                     self.phase[self.counter][1],
@@ -186,7 +188,27 @@ class RGBLed:
                     self.last_millis = current_time
 
         elif self.current_mode == "LIGHTS_4":
-            pass
+            if self.new_mode:
+                self.new_mode = False
+
+                step = 20
+                phase1 = [[val, val, val] for val in range(step + 1)]
+                phase2 = [[val, val, val] for val in range(step - 1, -1, -1)]
+                phase3 = [[val, val, 0] for val in range(step + 1)]
+                phase4 = [[val, val, 0] for val in range(step - 1, -1, -1)]
+                self.phase = phase1 + phase2 + phase3 + phase4
+
+            if current_time - self.last_millis >= 20:
+                self.set_color(
+                    self.phase[self.counter][0],
+                    self.phase[self.counter][1],
+                    self.phase[self.counter][2],
+                )
+                self.counter += 1
+                if self.counter >= len(self.phase):
+                    self.counter = 0
+
+                    self.last_millis = current_time
 
         elif self.current_mode == "LIGHTS_5":
             pass
@@ -201,7 +223,7 @@ class RGBLed:
 
                 self.phase = phase1 + phase2
 
-            if current_time - self.last_millis >= 50:
+            if current_time - self.last_millis >= 20:
                 self.set_color(
                     self.phase[self.counter][0],
                     self.phase[self.counter][1],
