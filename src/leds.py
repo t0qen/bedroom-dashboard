@@ -1,23 +1,19 @@
 from machine import Pin, PWM
-
-
-# Source - https://stackoverflow.com/a/70659904
-# Posted by CrazyChucky, modified by community. See post 'Timeline' for change history
-# Retrieved 2026-08-14, License - CC BY-SA 4.0
-def map_range(x, in_min, in_max, out_min, out_max):
-    return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
-
+import inputs
 
 class Led:
     def __init__(self, pin):
         self.pin = pin
-        self.led = Pin(self.pin, Pin.OUT)
+        self.led = PWM(Pin(self.pin, Pin.OUT))
+        self.led.freq(5000)
 
     def on(self):
-        self.led.value(1)
+        self.led.duty_u16(65535)
 
+    def value(self, val):
+        self.led.duty_u16(int(inputs.map_range(val, 0, 100, 0, 65535)))
     def off(self):
-        self.led.value(0)
+        self.led.duty_u16(0)
 
 
 class RGBLed:
@@ -37,9 +33,9 @@ class RGBLed:
         self.last_millis = 0
 
     def set_color(self, r, g, b):
-        self.led_r.duty_u16(map_range(r, 0, 100, 0, 65535))
-        self.led_g.duty_u16(map_range(g, 0, 100, 0, 65535))
-        self.led_b.duty_u16(map_range(b, 0, 100, 0, 65535))
+        self.led_r.duty_u16(int(inputs.map_range(r, 0, 100, 0, 65535)))
+        self.led_g.duty_u16(int(inputs.map_range(g, 0, 100, 0, 65535)))
+        self.led_b.duty_u16(int(inputs.map_range(b, 0, 100, 0, 65535)))
 
     def off(self):
         self.led_r.duty_u16(0)
@@ -51,9 +47,10 @@ class RGBLed:
         self.current_mode = mode
         self.new_mode = True
         self.counter = 0
+        print(f"[leds.py] INFO: new mode: '{self.current_mode}'")
 
     def update(self, current_time):
-        if self.current_mode == "menu_lights":
+        if self.current_mode == "LIGHTS":
             if self.new_mode:
                 self.new_mode = False
                 # mode setup
@@ -76,7 +73,7 @@ class RGBLed:
 
                     self.last_millis = current_time
 
-        elif self.current_mode == "menu_sockets":
+        elif self.current_mode == "SOCKETS":
             if self.new_mode:
                 self.new_mode = False
                 # mode setup
@@ -99,7 +96,7 @@ class RGBLed:
 
                     self.last_millis = current_time
 
-        elif self.current_mode == "menu_radio":
+        elif self.current_mode == "RADIO":
             if self.new_mode:
                 self.new_mode = False
                 # mode setup

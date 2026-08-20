@@ -43,7 +43,7 @@ void processDisplayCommand(String cmd)
   {
     display.display(false);
     Serial1.println("DONE");
-    Serial1.flush();         // On force l'envoi immédiat
+    Serial1.flush(); // On force l'envoi immédiat
     return;
   }
   if (cmd == "clearScreen()")
@@ -183,15 +183,13 @@ void networkTask(void *parameter)
 
           else if (cmd.startsWith("HA_TEMP("))
           {
-            // Format reçu : HA_TEMP(light.salon, 4000)
             String args = cmd.substring(8, cmd.length() - 1);
             int c1 = args.indexOf(',');
-
             String entity = args.substring(0, c1);
             String kelvin = args.substring(c1 + 1);
 
             url = "http://" + String(haIp) + ":8123/api/services/light/turn_on";
-            payload = "{\"entity_id\": \"" + entity + "\", \"kelvin\": " + kelvin + "}";
+            payload = "{\"entity_id\": \"" + entity + "\", \"color_temp_kelvin\": " + kelvin + "}";
           }
           if (payload != "")
           {
@@ -218,7 +216,7 @@ void networkTask(void *parameter)
 
 void displayTask(void *parameter)
 {
-  esp_task_wdt_delete(NULL); 
+  esp_task_wdt_delete(NULL);
   char cmdBuf[128];
   while (true)
   {
@@ -232,7 +230,7 @@ void displayTask(void *parameter)
 void setup()
 {
   Serial.begin(115200);
-  Serial1.setRxBufferSize(8192); 
+  Serial1.setRxBufferSize(8192);
   Serial1.begin(115200, SERIAL_8N1, D7, D6);
   delay(3000);
 

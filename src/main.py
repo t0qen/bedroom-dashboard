@@ -26,7 +26,8 @@ led_rgb = leds.RGBLed(11, 13, 12)
 
 pot = inputs.Pot(28)
 last_pot_value = pot.read()
-
+last_stabilized_pot_value = pot.read()
+last_pot_stabilization = time.ticks_ms()
 
 def clean():
     led_a.off()
@@ -76,52 +77,25 @@ def test():
 
     buzz.bip()
 
+DISPLAY_TRANSLATION = { # for matching current global state to what to show on e ink display
+    ("MENU", "LIGHTS"): ("menu_light_b", "menu_light_r"),
+    ("MENU", "SOCKETS"): ("menu_socket_b", "menu_socket_r"),
+    ("MENU", "RADIO"): ("menu_radio_b", "menu_radio_r"),
 
-# test()
-
-
-# def test2():
-#     while True:
-#         time.sleep(0.01)
-#         now = time.ticks_ms()
-
-
-# for i in range(100):
-
-#     led_rgb.set_color(0, i, int(i / 2))
-#     time.sleep_ms(2)
-# for i in range(100):
-#     led_rgb.set_color(0, abs(i - 100) , int(abs(i - 100) / 2))
-#     time.sleep_ms(7)
-
-# step = 20
-
-# for i in range(step):
-#     led_rgb.set_color(i, 0, abs(i - step))
-#     time.sleep_ms(20)
-# for i in range(step):
-#     led_rgb.set_color(abs(i - step), i , 0)
-#     time.sleep_ms(20)
-# for i in range(step):
-#     led_rgb.set_color(0, abs(i - step), i)
-#     time.sleep_ms(20)
-
-# for i in range(step):
-#     led_rgb.set_color(i, i, i)
-#     time.sleep_ms(20)
-# for i in range(step):
-#     led_rgb.set_color(abs(i - step), abs(i - step), step)
-#     time.sleep_ms(10)
-# for i in range(step):
-#     led_rgb.set_color(0, 0, abs(i - step))
-#     time.sleep_ms(20)
-
-# for i in range(33):
-#     led_rgb.set_color(abs(i - 33), abs(i - 33), abs(i - 33))
-#     time.sleep_ms(10)
-
-
-# test2()
+    ("LIGHTS", 1): ("submenu_light_b", "submenu_light_r_1"),
+    ("LIGHTS", 2): ("submenu_light_b", "submenu_light_r_2"),
+    ("LIGHTS", 3): ("submenu_light_b", "submenu_light_r_3"),
+    ("LIGHTS", 4): ("submenu_light_b", "submenu_light_r_4"),
+    ("LIGHTS", 5): ("submenu_light_b", "submenu_light_r_5"), 
+    
+    ("SOCKETS", 1): ("submenu_socket_b", "submenu_socket_r_1"),
+    ("SOCKETS", 2): ("submenu_socket_b", "submenu_socket_r_2"),
+    ("SOCKETS", 3): ("submenu_socket_b", "submenu_socket_r_3"),
+    ("SOCKETS", 4): ("submenu_socket_b", "submenu_socket_r_4"),
+    ("SOCKETS", 5): ("submenu_socket_b", "submenu_socket_r_5"),
+    
+    ("RADIO", 1): ("submenu_radio_b", "submenu_radio_r_1"),
+}
 
 current_global_state = "MENU"
 last_menu_state = None
@@ -146,7 +120,7 @@ try:
         led_rgb.update(now)
 
         # print(current_menu_state)
-
+        
         # inputs
         current_btn_bck_state = button_bck.is_pressed(now)
         current_btn_frw_state = button_frw.is_pressed(now)
@@ -200,6 +174,7 @@ try:
             elif current_btn_hme_state == "RELEASED":
 
                 current_global_state = current_menu_state
+                print(f"[main.py] IMPORTANT: entering '{current_menu_state}' submenu")
 
         else:
             if current_global_state == "LIGHTS":
@@ -208,12 +183,22 @@ try:
                 elif current_btn_frw_state == "RELEASED":
                     lights_submenu_counter += 1
 
-                if abs(current_pot_value - last_pot_value) >= 2:
+                if abs(current_pot_value - last_stabilized_pot_value) >= 10:
+                    last_stabilized_pot_value = current_pot_value
+                    print("mov")
                     current_lights = None
                     if lights_submenu_counter == 1:
-                        ha.set_brightness(home_assistant.Device.LATELIER, current_pot_value)
+                        if current_pot_value <= 2:
+                            ha.turn_off(home_assistant.Device.LATELIER)
+                            led_a.off()
+                        else:
+                            ha.turn_on(home_assistant.Device.LATELIER)
+                            led_a.value(current_pot_value)
+                            ha.set_brightness(home_assistant.Device.LATELIER, int(inputs.map_range(current_pot_value, 0, 100, 0, 255)))
+                                                
                     if lights_submenu_counter == 2:
-                        ha.set_color_temp(home_assistant.Device.LATELIER, inputs.map_range(current_pot_value, 0, 100, ))
+                        ha.turn_on(home_assistant.Device.LATELIER)
+                        ha.set_color_temp(home_assistant.Device.LATELIER, int(inputs.map_range(current_pot_value, 0, 100, 6500, 2000)))
                     # TODO
 
                 if lights_submenu_counter > 8: # count each colors of every lights
@@ -235,31 +220,36 @@ try:
                 current_global_state = "MENU"
 
         # display
-        if current_global_state == "MENU":
-            if current_menu_state != last_menu_state:
-                if current_menu_state == "LIGHTS":
-                    led_rgb.set_mode("menu_lights")
-                elif current_menu_state == "SOCKETS":
-                    led_rgb.set_mode("menu_sockets")
-                elif current_menu_state == "RADIO":
-                    led_rgb.set_mode("menu_radio")
 
-            if (
-                isinstance(last_activity_time, int)
-                and now - last_activity_time >= 1000
-                and displayed_menu_state != current_menu_state
-            ):
-                if current_menu_state == "LIGHTS":
-                    epaper.show_image("menu_light_b", "menu_light_r")
-                elif current_menu_state == "SOCKETS":
-                    epaper.show_image("menu_socket_b", "menu_socket_r")
-                elif current_menu_state == "RADIO":
-                    epaper.show_image("menu_radio_b", "menu_radio_r")
+        # always update rgb led
+        if current_global_state == "MENU" and current_menu_state != last_menu_state:
+            led_rgb.set_mode(f"{current_menu_state}")
 
-                displayed_menu_state = current_menu_state
+        # the e ink screen needs more code, because we cant send twice the same image (ai helped me a bit on this)
+        if isinstance(last_activity_time, int) and now - last_activity_time >= 1000:
+            if current_global_state == "MENU":
+                current_key = ("MENU", current_menu_state)
+            elif current_global_state == "LIGHTS":
+                current_key = ("LIGHTS", lights_submenu_counter)
+            elif current_global_state == "SOCKETS":
+                current_key = ("SOCKETS", sockets_submenu_counter)
+            elif current_global_state == "RADIO":
+                current_key = ("RADIO", 1)
+            else:
+                current_key = None
+
+            target_images = DISPLAY_TRANSLATION.get(current_key)
+            print(target_images)
+            if target_images and displayed_menu_state != current_key:
+                epaper.show_image(target_images[0], target_images[1])
+                displayed_menu_state = current_key
 
         last_menu_state = current_menu_state
         last_pot_value = current_pot_value
+
+        if now - last_pot_stabilization > 500:
+            last_stabilized_pot_value = current_pot_value
+            last_pot_stabilization = now
 
 except KeyboardInterrupt:
     print("[main.py] IMPORTANT: asked for stop the main program")

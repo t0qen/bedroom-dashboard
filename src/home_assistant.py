@@ -25,8 +25,8 @@ class HomeAssistant:
         self._send(f"HA_TOGGLE({device})")
 
     def set_brightness(self, device, brightness):
-        if brightness > 100:
-            brightness = 100
+        if brightness > 255:
+            brightness = 255
         if brightness < 0:
             brightness = 0
         self._send(f"HA_BRIGHT({device}, {brightness})")
