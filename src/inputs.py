@@ -45,3 +45,7 @@ class Pot:
         if self.result > 100:
             self.result = 100
         return self.result
+    
+    def read_raw(self):
+        return self.pot.read_u16()
+

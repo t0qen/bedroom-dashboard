@@ -29,6 +29,7 @@ last_pot_value = pot.read()
 last_stabilized_pot_value = pot.read()
 last_pot_stabilization = time.ticks_ms()
 
+
 def clean():
     led_a.off()
     led_b.off()
@@ -77,27 +78,29 @@ def test():
 
     buzz.bip()
 
-DISPLAY_TRANSLATION = { # for matching current global state to what to show on e ink display
+
+DISPLAY_TRANSLATION = {  # for matching current global state to what to show on e ink display
     ("MENU", "LIGHTS"): ("menu_light_b", "menu_light_r"),
     ("MENU", "SOCKETS"): ("menu_socket_b", "menu_socket_r"),
     ("MENU", "RADIO"): ("menu_radio_b", "menu_radio_r"),
-
     ("LIGHTS", 1): ("submenu_light_b", "submenu_light_r_1"),
-    ("LIGHTS", 2): ("submenu_light_b", "submenu_light_r_2"),
-    ("LIGHTS", 3): ("submenu_light_b", "submenu_light_r_3"),
-    ("LIGHTS", 4): ("submenu_light_b", "submenu_light_r_4"),
-    ("LIGHTS", 5): ("submenu_light_b", "submenu_light_r_5"), 
-    
+    ("LIGHTS", 2): ("submenu_light_b", "submenu_light_r_1"),
+    ("LIGHTS", 3): ("submenu_light_b", "submenu_light_r_2"),
+    ("LIGHTS", 4): ("submenu_light_b", "submenu_light_r_2"),
+    ("LIGHTS", 5): ("submenu_light_b", "submenu_light_r_2"),
+    ("LIGHTS", 6): ("submenu_light_b", "submenu_light_r_3"),
+    ("LIGHTS", 7): ("submenu_light_b", "submenu_light_r_4"),
+    ("LIGHTS", 8): ("submenu_light_b", "submenu_light_r_5"),
     ("SOCKETS", 1): ("submenu_socket_b", "submenu_socket_r_1"),
     ("SOCKETS", 2): ("submenu_socket_b", "submenu_socket_r_2"),
     ("SOCKETS", 3): ("submenu_socket_b", "submenu_socket_r_3"),
     ("SOCKETS", 4): ("submenu_socket_b", "submenu_socket_r_4"),
     ("SOCKETS", 5): ("submenu_socket_b", "submenu_socket_r_5"),
-    
     ("RADIO", 1): ("submenu_radio_b", "submenu_radio_r_1"),
 }
 
 current_global_state = "MENU"
+last_global_state = current_global_state
 last_menu_state = None
 current_menu_state = "LIGHTS"
 is_active = False
@@ -120,12 +123,13 @@ try:
         led_rgb.update(now)
 
         # print(current_menu_state)
-        
+
         # inputs
         current_btn_bck_state = button_bck.is_pressed(now)
         current_btn_frw_state = button_frw.is_pressed(now)
         current_btn_hme_state = button_hme.is_pressed(now)
         current_pot_value = pot.read()
+
 
         if (
             current_btn_bck_state == "PRESSED"
@@ -135,7 +139,6 @@ try:
             print("on")
             led_c.on()
 
-
         is_active = False
         if (
             current_btn_bck_state == "RELEASED"
@@ -144,7 +147,7 @@ try:
         ):
             led_c.off()
             is_active = True
-           
+
         if abs(current_pot_value - last_pot_value) >= 2:
             is_active = True
 
@@ -154,7 +157,6 @@ try:
         # logic
         if current_global_state == "MENU":
             if current_btn_bck_state == "RELEASED":
-
                 if current_menu_state == "LIGHTS":
                     current_menu_state = "RADIO"
                 elif current_menu_state == "SOCKETS":
@@ -163,7 +165,6 @@ try:
                     current_menu_state = "SOCKETS"
 
             elif current_btn_frw_state == "RELEASED":
-                
                 if current_menu_state == "LIGHTS":
                     current_menu_state = "SOCKETS"
                 elif current_menu_state == "SOCKETS":
@@ -172,7 +173,6 @@ try:
                     current_menu_state = "LIGHTS"
 
             elif current_btn_hme_state == "RELEASED":
-
                 current_global_state = current_menu_state
                 print(f"[main.py] IMPORTANT: entering '{current_menu_state}' submenu")
 
@@ -182,6 +182,11 @@ try:
                     lights_submenu_counter -= 1
                 elif current_btn_frw_state == "RELEASED":
                     lights_submenu_counter += 1
+
+                if lights_submenu_counter > 8:  # count each colors of every lights
+                    lights_submenu_counter = 1
+                if lights_submenu_counter < 1:  
+                    ights_submenu_counter = 8 
 
                 if abs(current_pot_value - last_stabilized_pot_value) >= 10:
                     last_stabilized_pot_value = current_pot_value
@@ -194,15 +199,102 @@ try:
                         else:
                             ha.turn_on(home_assistant.Device.LATELIER)
                             led_a.value(current_pot_value)
-                            ha.set_brightness(home_assistant.Device.LATELIER, int(inputs.map_range(current_pot_value, 0, 100, 0, 255)))
-                                                
+                            ha.set_brightness(
+                                home_assistant.Device.LATELIER,
+                                int(
+                                    inputs.map_range(current_pot_value, 0, 100, 0, 255)
+                                ),
+                            )
+
                     if lights_submenu_counter == 2:
                         ha.turn_on(home_assistant.Device.LATELIER)
-                        ha.set_color_temp(home_assistant.Device.LATELIER, int(inputs.map_range(current_pot_value, 0, 100, 6500, 2000)))
-                    # TODO
+                        ha.set_color_temp(
+                            home_assistant.Device.LATELIER,
+                            int(
+                                inputs.map_range(current_pot_value, 0, 100, 6500, 2000)
+                            ),
+                        )
 
-                if lights_submenu_counter > 8: # count each colors of every lights
-                    lights_submenu_counter = 1
+                    if lights_submenu_counter == 3:
+                        if current_pot_value <= 2:
+                            ha.turn_off(home_assistant.Device.LLEDS)
+                            led_a.off()
+                        else:
+                            ha.turn_on(home_assistant.Device.LLEDS)
+                            led_a.value(current_pot_value)
+                            ha.set_brightness(
+                                home_assistant.Device.LLEDS,
+                                int(
+                                    inputs.map_range(current_pot_value, 0, 100, 0, 255)
+                                ),
+                            )
+                    if lights_submenu_counter == 4:
+                        ha.turn_on(home_assistant.Device.LLEDS)
+                        ha.set_color_temp(
+                            home_assistant.Device.LLEDS,
+                            int(
+                                inputs.map_range(current_pot_value, 0, 100, 9000, 2500)
+                            ),
+                        )
+
+                    if lights_submenu_counter == 5:
+                        ha.turn_on(home_assistant.Device.LLEDS)
+                        led_a.value(current_pot_value)
+
+                        # pot_value = inputs.map_range(pot.read_raw(), 0, 65300, 0, 765)
+                        # r = int(min(255, pot_value))
+                        # g = int(min(255, pot_value-r))
+                        # b = int(min(255, pot_value-(r+g)))
+
+                        pot_value = inputs.map_range(pot.read_raw(), 0, 65300, 0, 765)
+                        if pot_value >= 0 and pot_value < 255: # red to green
+                            g = pot_value
+                            b = 0
+                            r = inputs.map_range(pot_value, 0, 255, 255, 0)
+                        elif pot_value > 255 and pot_value < 510: # green to blue
+                            g = inputs.map_range(pot_value, 255, 510, 255, 0)
+                            b = inputs.map_range(pot_value, 255, 510, 0, 255)
+                            r = 0
+                        elif pot_value > 510 and pot_value < 765: # blue to red
+                            g = 0
+                            b = inputs.map_range(pot_value, 510, 765, 255, 0)
+                            r = inputs.map_range(pot_value, 510, 765, 0, 255)
+
+                        ha.set_color(
+                            home_assistant.Device.LLEDS,
+                            r, g, b
+                        )
+
+                    if lights_submenu_counter == 6:
+                        if current_pot_value <= 2:
+                            ha.turn_off(home_assistant.Device.LBUREAU)
+                            led_a.off()
+                        else:
+                            ha.turn_on(home_assistant.Device.LBUREAU)
+                            led_a.value(current_pot_value)
+                            ha.set_brightness(
+                                home_assistant.Device.LBUREAU,
+                                int(
+                                    inputs.map_range(current_pot_value, 0, 100, 0, 255)
+                                ),
+                            )
+                    if lights_submenu_counter == 7:
+                        if current_pot_value <= 2:
+                            ha.turn_off(home_assistant.Device.LPRINCIPALE)
+                            led_a.off()
+                        else:
+                            ha.turn_on(home_assistant.Device.LPRINCIPALE)
+                            led_a.value(current_pot_value)
+                            ha.set_brightness(
+                                home_assistant.Device.LPRINCIPALE,
+                                int(
+                                    inputs.map_range(current_pot_value, 0, 100, 0, 255)
+                                ),
+                            )
+                    if lights_submenu_counter == 8:
+                        pass
+                    
+                
 
             elif current_global_state == "SOCKETS":
                 if current_btn_bck_state == "RELEASED":
@@ -216,38 +308,52 @@ try:
             elif current_global_state == "RADIO":
                 pass
 
-            if current_btn_hme_state == "RELEASED":            
+            if current_btn_hme_state == "RELEASED":
                 current_global_state = "MENU"
 
         # display
 
         # always update rgb led
+        update_rgb = False
         if current_global_state == "MENU" and current_menu_state != last_menu_state:
             led_rgb.set_mode(f"{current_menu_state}")
+        else:
+            if current_global_state != last_global_state:
+                update_rgb = True
+
+        if current_global_state == "MENU":
+            current_key = ("MENU", current_menu_state)
+            
+        elif current_global_state == "LIGHTS":
+            current_key = ("LIGHTS", lights_submenu_counter)
+            if update_rgb:
+                led_rgb.set_mode(f"LIGHTS_{lights_submenu_counter}")
+        elif current_global_state == "SOCKETS":
+            current_key = ("SOCKETS", sockets_submenu_counter)
+            if update_rgb:
+                led_rgb.set_mode(f"SOCKETS_{lights_submenu_counter}")
+        elif current_global_state == "RADIO":
+            current_key = ("RADIO", 1)
+            if update_rgb:
+                led_rgb.set_mode("RADIO")
+        else:
+            current_key = None
 
         # the e ink screen needs more code, because we cant send twice the same image (ai helped me a bit on this)
         if isinstance(last_activity_time, int) and now - last_activity_time >= 1000:
-            if current_global_state == "MENU":
-                current_key = ("MENU", current_menu_state)
-            elif current_global_state == "LIGHTS":
-                current_key = ("LIGHTS", lights_submenu_counter)
-            elif current_global_state == "SOCKETS":
-                current_key = ("SOCKETS", sockets_submenu_counter)
-            elif current_global_state == "RADIO":
-                current_key = ("RADIO", 1)
-            else:
-                current_key = None
+            led_a.off()
 
             target_images = DISPLAY_TRANSLATION.get(current_key)
-            print(target_images)
             if target_images and displayed_menu_state != current_key:
+                print("true")
                 epaper.show_image(target_images[0], target_images[1])
                 displayed_menu_state = current_key
 
         last_menu_state = current_menu_state
         last_pot_value = current_pot_value
+        last_global_state = current_global_state
 
-        if now - last_pot_stabilization > 500:
+        if now - last_pot_stabilization > 1000:
             last_stabilized_pot_value = current_pot_value
             last_pot_stabilization = now
 

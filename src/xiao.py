@@ -30,11 +30,12 @@ class Display:
             print(f"[xiao.py] WARNING: command '{cmd}' has already been added to queue")
 
     def show_image(self, img_b, img_r, x=0, y=0, w=296, h=128, c=0):
-        if img_b != self.last_image:
+        if img_r != self.last_image: # FIXME # TODO
             self.image_queue = [img_b, img_r, x, y, w, h, c]
             print(f"[xiao.py] INFO: image '{img_b, img_r}' has been added to queue")
         else:
             print(f"[xiao.py] WARNING: image '{img_b, img_r}' has already been added to queue")
+            print(self.image_queue)
 
 
 
@@ -71,7 +72,7 @@ class Display:
                 time.sleep(0.01)
                 self.uart.write("display()\n")
                 xiao_finished = False
-                self.last_image = self.image_queue[0] 
+                self.last_image = self.image_queue[1] 
                 self.image_queue = [] 
                 print("[xiao.py] INFO: imaged sended to xiao")
 
