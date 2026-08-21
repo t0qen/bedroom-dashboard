@@ -18,6 +18,7 @@ const char *ssid = "Livebox-B780";
 const char *password = "5tCVCnX9kFXfrPXNR7";
 const char *haIp = "192.168.1.23";
 const char *haToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxYTUyMjhmM2IzZjc0ZWY1OWZkZGIyZDc3ZGE4YjIxNSIsImlhdCI6MTc4Njc4MTYwNSwiZXhwIjoyMTAyMTQxNjA1fQ.tA3-pHjlnMmLU6XyKy-LzGls-aqS6-Mp0SBAz0Nn5kU";
+bool wifi_connected = true;
 
 GxEPD2_3C<GxEPD2_290_C90c, GxEPD2_290_C90c::HEIGHT> display(
     GxEPD2_290_C90c(3, 5, 2, 4));
@@ -129,7 +130,7 @@ void networkTask(void *parameter)
       if (cmd.startsWith("HA_"))
       {
         // C'est une commande HA, on la traite tout de suite
-        if (WiFi.status() == WL_CONNECTED)
+        if (wifi_connected && WiFi.status() == WL_CONNECTED)
         {
           HTTPClient http;
           String url = "http://" + String(haIp) + ":8123/api/services/homeassistant/";
@@ -237,9 +238,15 @@ void setup()
   // Connexion Wi-Fi
   WiFi.begin(ssid, password);
   Serial.print("Connexion WiFi");
+  int i = 0;
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
+    i++;
+    if (i >= 30) {
+      wifi_connected = false;
+      break;
+    }
     Serial.print(".");
   }
   Serial.println(" Connecté !");
@@ -284,7 +291,13 @@ void setup()
 
   // Lancement des deux tâches en parallèle sur le 2ème cœur ou via le scheduler
   xTaskCreatePinnedToCore(networkTask, "NetworkTask", 10000, NULL, 2, NULL, 0); // Priorité 2 (haute)
+
+  
   xTaskCreatePinnedToCore(displayTask, "DisplayTask", 16384, NULL, 1, NULL, 1); // Priorité 1 (basse)
+  if (!wifi_connected) {
+    WiFi.disconnect();
+    WiFi.reconnect(); 
+  }
 }
 
 void loop()
