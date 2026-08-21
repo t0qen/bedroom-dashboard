@@ -261,5 +261,72 @@ class RGBLed:
                     self.counter = 0
 
                     self.last_millis = current_time
+
+
+        elif self.current_mode == "SOCKETS_1":
+            if self.new_mode:
+                self.new_mode = False
+
+                step = 20
+                phase1 = [[step, 0, step] for val in range(step + 1)]
+                phase2 = [[val, 0, val] for val in range(step - 1, -1, -1)]
+
+                self.phase = phase1 + phase2
+
+            if current_time - self.last_millis >= 20:
+                self.set_color(
+                    self.phase[self.counter][0],
+                    self.phase[self.counter][1],
+                    self.phase[self.counter][2],
+                )
+                self.counter += 1
+                if self.counter >= len(self.phase):
+                    self.counter = 0
+
+                    self.last_millis = current_time
+
+        elif self.current_mode == "SOCKETS_2" or self.current_mode == "SOCKETS_3":
+            if self.new_mode:
+                self.new_mode = False
+
+                step = 20
+                phase1 = [[0, step, step] for val in range(step + 1)]
+                phase2 = [[0, val, val] for val in range(step - 1, -1, -1)]
+
+                self.phase = phase1 + phase2
+
+            if current_time - self.last_millis >= 20:
+                self.set_color(
+                    self.phase[self.counter][0],
+                    self.phase[self.counter][1],
+                    self.phase[self.counter][2],
+                )
+                self.counter += 1
+                if self.counter >= len(self.phase):
+                    self.counter = 0
+
+                    self.last_millis = current_time
+
+        elif self.current_mode == "SOCKETS_4" or self.current_mode == "SOCKETS_5":
+            if self.new_mode:
+                self.new_mode = False
+
+                step = 20
+                phase1 = [[step/2, 0, step] for val in range(step + 1)]
+                phase2 = [[abs(val/2), 0, val] for val in range(step - 1, -1, -1)]
+
+                self.phase = phase1 + phase2
+
+            if current_time - self.last_millis >= 20:
+                self.set_color(
+                    self.phase[self.counter][0],
+                    self.phase[self.counter][1],
+                    self.phase[self.counter][2],
+                )
+                self.counter += 1
+                if self.counter >= len(self.phase):
+                    self.counter = 0
+
+                    self.last_millis = current_time
             
 

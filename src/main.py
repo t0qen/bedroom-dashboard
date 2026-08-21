@@ -97,6 +97,7 @@ DISPLAY_TRANSLATION = {  # for matching current global state to what to show on 
     ("SOCKETS", 4): ("submenu_socket_b", "submenu_socket_r_4"),
     ("SOCKETS", 5): ("submenu_socket_b", "submenu_socket_r_5"),
     ("RADIO", 1): ("submenu_radio_b", "submenu_radio_r_1"),
+    ("RADIO", 2): ("submenu_radio_b", "submenu_radio_r_2")
 }
 
 current_global_state = "MENU"
@@ -340,9 +341,54 @@ try:
 
                 if sockets_submenu_counter > 5:
                     sockets_submenu_counter = 1
+                if sockets_submenu_counter < 1:
+                    sockets_submenu_counter = 5
+
+                if sockets_submenu_counter == 1:
+                    if current_pot_value > 60:
+                        #ha.turn_on(home_assistant.Device.PPC)
+                        pass
+                    else:
+                        pass
+                        # ha.turn_off(home_assistant.Device.PPC)
+
+                if sockets_submenu_counter == 2:
+                    if current_pot_value > 60:
+                        led_a.on()
+                        remote.press("b")
+                    else:
+                        remote.press("off")
+
+                if sockets_submenu_counter == 3:
+                    if current_pot_value > 60:
+                        led_a.on()
+                        remote.press("c")
+                    else:
+                        remote.press("off")
+
+                if sockets_submenu_counter == 4:
+                    if current_pot_value > 60:
+                        ha.turn_on(home_assistant.Device.PGLOBALE)
+                    else:
+                        ha.turn_off(home_assistant.Device.PGLOBALE)
+
+                if sockets_submenu_counter == 5:
+                    if current_pot_value > 60:
+                        ha.turn_on(home_assistant.Device.PETAGERE)
+                    else:
+                        ha.turn_off(home_assistant.Device.PETAGERE)
 
             elif current_global_state == "RADIO":
-                pass
+                if current_btn_bck_state == "RELEASED":
+                    sockets_submenu_counter -= 1
+                elif current_btn_frw_state == "RELEASED":
+                    sockets_submenu_counter += 1
+
+                if sockets_submenu_counter > 2:
+                    sockets_submenu_counter = 1
+                if sockets_submenu_counter < 1:
+                    sockets_submenu_counter = 2
+                
 
             if current_btn_hme_state == "RELEASED":
                 current_global_state = "MENU"
@@ -364,10 +410,10 @@ try:
             led_rgb.set_mode(f"LIGHTS_{lights_submenu_counter}")
         elif current_global_state == "SOCKETS":
             current_key = ("SOCKETS", sockets_submenu_counter)
-            led_rgb.set_mode(f"SOCKETS_{lights_submenu_counter}")
+            led_rgb.set_mode(f"SOCKETS_{sockets_submenu_counter}")
         elif current_global_state == "RADIO":
-            current_key = ("RADIO", 1)
-            led_rgb.set_mode("RADIO")
+            current_key = ("RADIO", radio_submenu_counter)
+            led_rgb.set_mode(f"RADIO_{radio_submenu_counter}")
         else:
             current_key = None
 
