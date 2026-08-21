@@ -29,13 +29,16 @@ class RGBLed:
         self.new_mode = False
         self.counter = 0
         self.phase = []
-
+        self.prev_colors = []
         self.last_millis = 0
 
     def set_color(self, r, g, b):
-        self.led_r.duty_u16(int(inputs.map_range(r, 0, 100, 0, 65535)))
-        self.led_g.duty_u16(int(inputs.map_range(g, 0, 100, 0, 65535)))
-        self.led_b.duty_u16(int(inputs.map_range(b, 0, 100, 0, 65535)))
+        if self.prev_colors != [r, g, b]:
+            self.led_r.duty_u16(int(inputs.map_range(r, 0, 100, 0, 65535)))
+            self.led_g.duty_u16(int(inputs.map_range(g, 0, 100, 0, 65535)))
+            self.led_b.duty_u16(int(inputs.map_range(b, 0, 100, 0, 65535)))
+
+        self.prev_colors = [r, g, b]
 
     def off(self):
         self.led_r.duty_u16(0)
@@ -43,8 +46,9 @@ class RGBLed:
         self.led_b.duty_u16(0)
 
     def set_mode(self, mode):
-        self.off()
+        
         if mode != self.current_mode:
+            self.off()
             self.current_mode = mode
             self.new_mode = True
             self.counter = 0
@@ -237,5 +241,25 @@ class RGBLed:
 
 
         elif self.current_mode == "LIGHTS_8":
-            pass
+            if self.new_mode:
+                self.new_mode = False
+
+                step = 20
+                phase1 = [[step, step, 0] for val in range(step + 1)]
+                phase2 = [[0, 0, 0] for val in range(step - 1, -1, -1)]
+
+                self.phase = phase1 + phase2
+
+            if current_time - self.last_millis >= 20:
+                self.set_color(
+                    self.phase[self.counter][0],
+                    self.phase[self.counter][1],
+                    self.phase[self.counter][2],
+                )
+                self.counter += 1
+                if self.counter >= len(self.phase):
+                    self.counter = 0
+
+                    self.last_millis = current_time
+            
 

@@ -35,8 +35,6 @@ class Display:
             print(f"[xiao.py] INFO: image '{img_b, img_r}' has been added to queue")
         else:
             print(f"[xiao.py] WARNING: image '{img_b, img_r}' has already been added to queue")
-            print(self.image_queue)
-
 
 
     def update(self, current_time):

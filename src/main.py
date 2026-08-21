@@ -110,6 +110,8 @@ pot_changed = False
 lights_submenu_counter = 1
 sockets_submenu_counter = 1
 radio_submenu_counter = 1
+current_key = None
+last_key = None
 
 try:
     while True:
@@ -121,6 +123,7 @@ try:
         epaper.update(now)
         remote.update(now)
         led_rgb.update(now)
+        ha.update(now)
 
         # print(current_menu_state)
 
@@ -131,6 +134,8 @@ try:
         current_pot_value = pot.read()
 
 
+
+       
         if (
             current_btn_bck_state == "PRESSED"
             or current_btn_frw_state == "PRESSED"
@@ -148,7 +153,7 @@ try:
             led_c.off()
             is_active = True
 
-        if abs(current_pot_value - last_pot_value) >= 2:
+        if abs(current_pot_value - last_pot_value) >= 10:
             is_active = True
 
         if is_active:
@@ -186,9 +191,9 @@ try:
                 if lights_submenu_counter > 8:  # count each colors of every lights
                     lights_submenu_counter = 1
                 if lights_submenu_counter < 1:  
-                    ights_submenu_counter = 8 
+                    lights_submenu_counter = 8 
 
-                if abs(current_pot_value - last_stabilized_pot_value) >= 10:
+                if abs(current_pot_value - last_stabilized_pot_value) >= 2:
                     last_stabilized_pot_value = current_pot_value
                     print("mov")
                     current_lights = None
@@ -245,21 +250,48 @@ try:
                         # r = int(min(255, pot_value))
                         # g = int(min(255, pot_value-r))
                         # b = int(min(255, pot_value-(r+g)))
-
-                        pot_value = inputs.map_range(pot.read_raw(), 0, 65300, 0, 765)
-                        if pot_value >= 0 and pot_value < 255: # red to green
-                            g = pot_value
-                            b = 0
-                            r = inputs.map_range(pot_value, 0, 255, 255, 0)
-                        elif pot_value > 255 and pot_value < 510: # green to blue
-                            g = inputs.map_range(pot_value, 255, 510, 255, 0)
-                            b = inputs.map_range(pot_value, 255, 510, 0, 255)
-                            r = 0
-                        elif pot_value > 510 and pot_value < 765: # blue to red
+                        
+                        pot_value = inputs.map_range(pot.read_raw(), 0, 65300, 0, 1535)
+                        if pot_value < 256: # red to green
+                            r = 255
+                            b = pot_value
                             g = 0
-                            b = inputs.map_range(pot_value, 510, 765, 255, 0)
-                            r = inputs.map_range(pot_value, 510, 765, 0, 255)
 
+                        elif pot_value < 512:
+                            r = 511 - pot_value
+                            b = 255
+                            g = 0
+
+                        elif pot_value < 768:
+                            r = 0
+                            b = 255
+                            g =  pot_value - 511
+
+                        elif pot_value < 1024:
+                            r = 0
+                            b = 1023 - pot_value
+                            g = 255
+
+                        elif pot_value < 1280:
+                            r = pot_value - 1024;
+                            b = 0;
+                            g = 255;
+
+                        else:
+                            r = 255
+                            b = 0
+                            g = 1535 - pot_value
+                        
+                        r = int(r)
+                        g = int(g)
+                        b = int(b)
+                        # print("-----")
+                        # print(r)
+                        # print(g)
+                        # print(b)
+                        # print("-----")
+
+                        led_rgb.set_color(r, g, b)
                         ha.set_color(
                             home_assistant.Device.LLEDS,
                             r, g, b
@@ -292,7 +324,11 @@ try:
                                 ),
                             )
                     if lights_submenu_counter == 8:
-                        pass
+                        if current_pot_value > 60:
+                            remote.press("a")
+                        else:
+                            remote.press("off")
+
                     
                 
 
@@ -326,7 +362,6 @@ try:
         elif current_global_state == "LIGHTS":
             current_key = ("LIGHTS", lights_submenu_counter)
             led_rgb.set_mode(f"LIGHTS_{lights_submenu_counter}")
-            print(f"LIGHTS_{lights_submenu_counter}")
         elif current_global_state == "SOCKETS":
             current_key = ("SOCKETS", sockets_submenu_counter)
             led_rgb.set_mode(f"SOCKETS_{lights_submenu_counter}")
@@ -335,6 +370,10 @@ try:
             led_rgb.set_mode("RADIO")
         else:
             current_key = None
+
+        if last_key != current_key:
+            pass
+        last_key = current_key
 
         # the e ink screen needs more code, because we cant send twice the same image (ai helped me a bit on this)
         if isinstance(last_activity_time, int) and now - last_activity_time >= 1000:
