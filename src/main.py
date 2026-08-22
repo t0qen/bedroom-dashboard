@@ -194,7 +194,7 @@ try:
                 if lights_submenu_counter < 1:  
                     lights_submenu_counter = 8 
 
-                if abs(current_pot_value - last_stabilized_pot_value) >= 2:
+                if abs(current_pot_value - last_stabilized_pot_value) >= 10:
                     last_stabilized_pot_value = current_pot_value
                     print("mov")
                     current_lights = None
@@ -346,11 +346,9 @@ try:
 
                 if sockets_submenu_counter == 1:
                     if current_pot_value > 60:
-                        #ha.turn_on(home_assistant.Device.PPC)
-                        pass
+                        ha.turn_on(home_assistant.Device.PPC)
                     else:
-                        pass
-                        # ha.turn_off(home_assistant.Device.PPC)
+                        ha.turn_off(home_assistant.Device.PPC)
 
                 if sockets_submenu_counter == 2:
                     if current_pot_value > 60:
