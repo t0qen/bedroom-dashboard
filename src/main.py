@@ -113,6 +113,7 @@ sockets_submenu_counter = 1
 radio_submenu_counter = 1
 current_key = None
 last_key = None
+sleeping = False
 
 try:
     while True:
@@ -159,6 +160,8 @@ try:
 
         if is_active:
             last_activity_time = now
+            led_rgb.wakeup()
+            sleeping = False
 
         # logic
         if current_global_state == "MENU":
@@ -428,6 +431,12 @@ try:
                 print("true")
                 epaper.show_image(target_images[0], target_images[1])
                 displayed_menu_state = current_key
+
+        if isinstance(last_activity_time, int) and now - last_activity_time >= 60000:
+            if not sleeping:
+                led_rgb.sleep()
+                sleeping = True
+
 
         last_menu_state = current_menu_state
         last_pot_value = current_pot_value
