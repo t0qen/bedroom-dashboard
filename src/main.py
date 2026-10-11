@@ -114,6 +114,8 @@ radio_submenu_counter = 1
 current_key = None
 last_key = None
 sleeping = False
+light_pot_threshold = 15
+epaper_timeout_show_image = 2000
 
 try:
     while True:
@@ -135,9 +137,6 @@ try:
         current_btn_hme_state = button_hme.is_pressed(now)
         current_pot_value = pot.read()
 
-
-
-       
         if (
             current_btn_bck_state == "PRESSED"
             or current_btn_frw_state == "PRESSED"
@@ -197,12 +196,12 @@ try:
                 if lights_submenu_counter < 1:  
                     lights_submenu_counter = 8 
 
-                if abs(current_pot_value - last_stabilized_pot_value) >= 10:
+                if abs(current_pot_value - last_stabilized_pot_value) >= light_pot_threshold:
                     last_stabilized_pot_value = current_pot_value
                     print("mov")
                     current_lights = None
                     if lights_submenu_counter == 1:
-                        if current_pot_value <= 2:
+                        if current_pot_value <= 10:
                             ha.turn_off(home_assistant.Device.LATELIER)
                             led_a.off()
                         else:
@@ -225,7 +224,7 @@ try:
                         )
 
                     if lights_submenu_counter == 3:
-                        if current_pot_value <= 2:
+                        if current_pot_value <= 10:
                             ha.turn_off(home_assistant.Device.LLEDS)
                             led_a.off()
                         else:
@@ -302,7 +301,7 @@ try:
                         )
 
                     if lights_submenu_counter == 6:
-                        if current_pot_value <= 2:
+                        if current_pot_value <= 10:
                             ha.turn_off(home_assistant.Device.LBUREAU)
                             led_a.off()
                         else:
@@ -315,7 +314,7 @@ try:
                                 ),
                             )
                     if lights_submenu_counter == 7:
-                        if current_pot_value <= 2:
+                        if current_pot_value <= 10:
                             ha.turn_off(home_assistant.Device.LPRINCIPALE)
                             led_a.off()
                         else:
@@ -347,37 +346,40 @@ try:
                 if sockets_submenu_counter < 1:
                     sockets_submenu_counter = 5
 
-                if sockets_submenu_counter == 1:
-                    if current_pot_value > 60:
-                        ha.turn_on(home_assistant.Device.PPC)
-                    else:
-                        ha.turn_off(home_assistant.Device.PPC)
+                if abs(current_pot_value - last_stabilized_pot_value) >= 10:
+                    last_stabilized_pot_value = current_pot_value
+                    print("mov")
+                    if sockets_submenu_counter == 1:
+                        if current_pot_value > 60:
+                            ha.turn_on(home_assistant.Device.PPC)
+                        else:
+                            ha.turn_off(home_assistant.Device.PPC)
 
-                if sockets_submenu_counter == 2:
-                    if current_pot_value > 60:
-                        led_a.on()
-                        remote.press("b")
-                    else:
-                        remote.press("off")
+                    if sockets_submenu_counter == 2:
+                        if current_pot_value > 60:
+                            led_a.on()
+                            remote.press("b")
+                        else:
+                            remote.press("off")
 
-                if sockets_submenu_counter == 3:
-                    if current_pot_value > 60:
-                        led_a.on()
-                        remote.press("c")
-                    else:
-                        remote.press("off")
+                    if sockets_submenu_counter == 3:
+                        if current_pot_value > 60:
+                            led_a.on()
+                            remote.press("c")
+                        else:
+                            remote.press("off")
 
-                if sockets_submenu_counter == 4:
-                    if current_pot_value > 60:
-                        ha.turn_on(home_assistant.Device.PGLOBALE)
-                    else:
-                        ha.turn_off(home_assistant.Device.PGLOBALE)
+                    if sockets_submenu_counter == 4:
+                        if current_pot_value > 60:
+                            ha.turn_on(home_assistant.Device.PGLOBALE)
+                        else:
+                            ha.turn_off(home_assistant.Device.PGLOBALE)
 
-                if sockets_submenu_counter == 5:
-                    if current_pot_value > 60:
-                        ha.turn_on(home_assistant.Device.PETAGERE)
-                    else:
-                        ha.turn_off(home_assistant.Device.PETAGERE)
+                    if sockets_submenu_counter == 5:
+                        if current_pot_value > 60:
+                            ha.turn_on(home_assistant.Device.PETAGERE)
+                        else:
+                            ha.turn_off(home_assistant.Device.PETAGERE)
 
             elif current_global_state == "RADIO":
                 if current_btn_bck_state == "RELEASED":
@@ -393,6 +395,7 @@ try:
 
             if current_btn_hme_state == "RELEASED":
                 current_global_state = "MENU"
+                current_menu_state == "LIGHTS"
 
         # display
 
@@ -423,7 +426,7 @@ try:
         last_key = current_key
 
         # the e ink screen needs more code, because we cant send twice the same image (ai helped me a bit on this)
-        if isinstance(last_activity_time, int) and now - last_activity_time >= 1000:
+        if isinstance(last_activity_time, int) and now - last_activity_time >= epaper_timeout_show_image:
             led_a.off()
 
             target_images = DISPLAY_TRANSLATION.get(current_key)
@@ -436,7 +439,6 @@ try:
             if not sleeping:
                 led_rgb.sleep()
                 sleeping = True
-
 
         last_menu_state = current_menu_state
         last_pot_value = current_pot_value
