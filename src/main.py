@@ -117,6 +117,9 @@ sleeping = False
 light_pot_threshold = 15
 epaper_timeout_show_image = 2000
 
+
+buzz.bip(freq=3000, delay=100)
+
 try:
     while True:
         # global
@@ -143,6 +146,7 @@ try:
             or current_btn_hme_state == "PRESSED"
         ):
             print("on")
+            buzz.bip(freq=5000, delay=50)
             led_c.on()
 
         is_active = False
@@ -156,7 +160,6 @@ try:
 
         if abs(current_pot_value - last_pot_value) >= 10:
             is_active = True
-
         if is_active:
             last_activity_time = now
             led_rgb.wakeup()
@@ -190,6 +193,10 @@ try:
                     lights_submenu_counter -= 1
                 elif current_btn_frw_state == "RELEASED":
                     lights_submenu_counter += 1
+                elif current_btn_hme_state == "RELEASED":
+                    current_global_state = "MENU"
+                    current_menu_state = "LIGHTS"
+                    last_menu_state = ""
 
                 if lights_submenu_counter > 8:  # count each colors of every lights
                     lights_submenu_counter = 1
@@ -340,6 +347,10 @@ try:
                     sockets_submenu_counter -= 1
                 elif current_btn_frw_state == "RELEASED":
                     sockets_submenu_counter += 1
+                elif current_btn_hme_state == "RELEASED":
+                    current_global_state = "MENU"
+                    current_menu_state = "SOCKETS"
+                    last_menu_state = ""
 
                 if sockets_submenu_counter > 5:
                     sockets_submenu_counter = 1
@@ -386,6 +397,10 @@ try:
                     sockets_submenu_counter -= 1
                 elif current_btn_frw_state == "RELEASED":
                     sockets_submenu_counter += 1
+                elif current_btn_hme_state == "RELEASED":
+                    current_global_state = "MENU"
+                    current_menu_state = "RADIO"
+                    last_menu_state = ""
 
                 if sockets_submenu_counter > 2:
                     sockets_submenu_counter = 1
