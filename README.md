@@ -35,3 +35,6 @@ software :
 <img width="3264" height="2448" alt="IMG_20261026_102010" src="https://github.com/user-attachments/assets/fbc6f8c9-7d40-4690-b230-e4c308894874" />
 <img width="3264" height="2448" alt="IMG_20261026_102332" src="https://github.com/user-attachments/assets/8b9fdab3-4ead-4004-a29b-c903c3fd790b" />
 <img width="3264" height="2448" alt="IMG_20261026_102022" src="https://github.com/user-attachments/assets/3a087466-044a-4811-8419-3748bd8216e9" />
+
+### models
+https://cad.onshape.com/documents/ad628567f996aec9f7dfa373/w/c9bc160ac345cb43137849e8/e/b2123f6f02230e54762eaeb9?renderMode=0&uiState=6adfa595d9f9c3bd8f9fb129
