@@ -30,3 +30,8 @@ flowchart LR
 software :
 > [!IMPORTANT]
 > I use Ai to write [main.cpp](https://github.com/t0qen/bedroom-dashboard/blob/main/xiao/src/main.cpp)
+
+### 📷️ screenshots
+<img width="3264" height="2448" alt="IMG_20261026_102010" src="https://github.com/user-attachments/assets/fbc6f8c9-7d40-4690-b230-e4c308894874" />
+<img width="3264" height="2448" alt="IMG_20261026_102332" src="https://github.com/user-attachments/assets/8b9fdab3-4ead-4004-a29b-c903c3fd790b" />
+<img width="3264" height="2448" alt="IMG_20261026_102022" src="https://github.com/user-attachments/assets/3a087466-044a-4811-8419-3748bd8216e9" />
