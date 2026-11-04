@@ -27,7 +27,7 @@ flowchart LR
     C --> D[e-ink screen]
     C -.->|Wifi| E[home assistant]
 ```
-<img width="1035" height="817" alt="image" src="https://github.com/user-attachments/assets/6e1c2a3a-3ec6-4b4d-b6df-08436ab2a734" />
+<img src="images/5.jpg" />
 
 
 software :
