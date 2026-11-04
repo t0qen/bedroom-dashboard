@@ -3,10 +3,13 @@
 
   ### bedroom dashboard 🛜️
   A **"macropad"** to control **everythings** connected in my bedroom throught *home assistant*.
+
+  [features](#features) - [how it works](#hiw) - [screenshots](#screenshots) - [production](#production) - [about](#about) 
 </div>
 
 ---------------
-### ✅️ features 
+
+### ✅️ features <a id='features'></a>
 - control **lights,leds,sockets** trought home assistant
 - visual feedbacks : 3 leds and a rgb leds
 - buzzer feedback
@@ -15,7 +18,7 @@
 - control **chip remotly controlled sockets** by hacking the remote with optocouplers
 - (planned) control **webradio** and API call to self-hosted *azuracast* to switch current music
 
-### 📜️ how it works
+### 📜️ how it works <a id='hiw'></a>
 hardware :
 ```mermaid
 flowchart LR
@@ -31,10 +34,19 @@ software :
 > [!IMPORTANT]
 > I use Ai to write [main.cpp](https://github.com/t0qen/bedroom-dashboard/blob/main/xiao/src/main.cpp)
 
-### 📷️ screenshots
-<img width="3264" height="2448" alt="IMG_20261026_102010" src="https://github.com/user-attachments/assets/fbc6f8c9-7d40-4690-b230-e4c308894874" />
-<img width="3264" height="2448" alt="IMG_20261026_102332" src="https://github.com/user-attachments/assets/8b9fdab3-4ead-4004-a29b-c903c3fd790b" />
-<img width="3264" height="2448" alt="IMG_20261026_102022" src="https://github.com/user-attachments/assets/3a087466-044a-4811-8419-3748bd8216e9" />
+### 📷️ screenshots <a id='screenshots'></a>
+<img src="images/1.jpg" />
+<img src="images/2.jpg" />
+<img src="images/3.jpg" />
+<img src="images/4.jpg" />
 
-### models
-https://cad.onshape.com/documents/ad628567f996aec9f7dfa373/w/c9bc160ac345cb43137849e8/e/b2123f6f02230e54762eaeb9?renderMode=0&uiState=6adfa595d9f9c3bd8f9fb129
+
+### 📦️ production <a id='production'></a>
+- [models](https://github.com/t0qen/bedroom-dashboard/tree/main/production/models), or visit [onshape](https://cad.onshape.com/documents/ad628567f996aec9f7dfa373/w/c9bc160ac345cb43137849e8/e/b2123f6f02230e54762eaeb9?renderMode=0&uiState=6adfa595d9f9c3bd8f9fb129) directly
+
+- [bom](https://github.com/t0qen/bedroom-dashboard/blob/main/production/BOM.md) which contains all the components of the project
+
+
+### ✏️ about <a id='about'></a>
+**Why make this ?**
+Because almost everythings is conencted in bedroom, and having to unlock my phone everytime to do things as easy as switch a socket was exhausting. I wanted a easy, fast and reliable solution.
